@@ -9,10 +9,31 @@ var leadself = 'Me: ',
 									"She laughed, and the desert sang.",
 									"You’ve got about as much charm as a dead slug."];
 
+function talk(msg){
+	echo(leadself + msg);
+}
 
+function replyYesNo(){
+	var msg = Math.random() > .5 ? msgYes : msgNo;
+	echo(leadcomputer + msg);
+}
 
+function saySassyStuff(){
+	var msg = aSassyStuff[Math.floor(Math.random()*aSassyStuff.length)];
+	echo(leadcomputer + msg);
+}
 
+function echo(msg){
+	aSaid.push('<div>' + msg + '</div>');
 
+	var aSaidLength = aSaid.length,
+		start = Math.max(aSaidLength - 6, 0),
+		out = "";
 
+	for(var i=start; i < aSaidLength; i++){
+		out += aSaid[i];
+	}
 
-
+	$('.advert').html(out);
+	$('#talk>span').text(msg);
+}
