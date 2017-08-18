@@ -1,18 +1,40 @@
 (function(win, $){
+    var CircleFactory = (function(){
+        var RedCircle = function(){
+            this.item = $('<div class="circle"></div>');
+        };
+        var BlueCircle = function(){
+            this.item = $('<div class="circle" style="background: blue;"></div>');
+        };
+        var CircleFactory = function(){
+            this.create = function(color){
+                switch(color) {
+                    case 'blue':
+                        return new BlueCircle();
+                    case 'red':
+                    default:
+                        return new RedCircle();
+                }
+            }
+        };
+        return CircleFactory;
+    })();
+
     var CircleGeneratorSingleton = (function(){
         var instance;
 
         function init() {
             var _aCircle = [],
-                _stage = $('.advert');
+                _stage = $('.advert'),
+                _cf = new CircleFactory();
 
             function _position(circle, left, top){
                 circle.css('left', left);
                 circle.css('top', top);
             }
 
-            function create(left, top){
-                var circle = $('<div class="circle"></div>');
+            function create(left, top, color){
+                var circle = _cf.create(color).item;
                 _position(circle, left, top);
                 return circle;
             }
@@ -46,15 +68,18 @@
     $(win.document).ready(function(){
         $('.advert').click(function(e){
             var cg = CircleGeneratorSingleton.getInstance();
-            var circle = cg.create(e.pageX- 25, e.pageY- 25);
+            var circle = cg.create(e.pageX- 25, e.pageY- 25, 'red');
             cg.add(circle);
         });
 
         $(win).keypress(function(e){
             if (e.key === 'a'){
                 var cg = CircleGeneratorSingleton.getInstance();
-                var circle = cg.create(Math.floor(Math.random() * 600),
-                    Math.floor(Math.random() * 600));
+                var circle = cg.create(
+                    Math.floor(Math.random() * 600),
+                    Math.floor(Math.random() * 600),
+                    'blue'
+                );
                 cg.add(circle);
             }
         });
