@@ -1,24 +1,30 @@
 (function(win, $){
-    var CircleFactory = (function(){
-        var RedCircle = function(){
-            this.item = $('<div class="circle"></div>');
+    var RedCircle = function(){};
+    RedCircle.prototype.create = function(){
+        this.item = $('<div class="circle"></div>');
+        return this;
+    };
+
+    var BlueCircle = function(){
+
+    };
+    BlueCircle.prototype.create = function(){
+        this.item = $('<div class="circle" style="background: blue;"></div>');
+        return this;
+    };
+
+    var CircleFactory = function(){
+        this.types = {};
+
+        this.create = function(type){
+            return new this.types[type]().create();
         };
-        var BlueCircle = function(){
-            this.item = $('<div class="circle" style="background: blue;"></div>');
-        };
-        var CircleFactory = function(){
-            this.create = function(color){
-                switch(color) {
-                    case 'blue':
-                        return new BlueCircle();
-                    case 'red':
-                    default:
-                        return new RedCircle();
-                }
+        this.register = function(type, cls){
+            if (cls.prototype.create){
+                this.types[type] = cls;
             }
         };
-        return CircleFactory;
-    })();
+    };
 
     var CircleGeneratorSingleton = (function(){
         var instance;
@@ -27,14 +33,16 @@
             var _aCircle = [],
                 _stage = $('.advert'),
                 _cf = new CircleFactory();
+            _cf.register('red', RedCircle);
+            _cf.register('blue', BlueCircle);
 
             function _position(circle, left, top){
                 circle.css('left', left);
                 circle.css('top', top);
             }
 
-            function create(left, top, color){
-                var circle = _cf.create(color).item;
+            function create(left, top, type){
+                var circle = _cf.create(type).item;
                 _position(circle, left, top);
                 return circle;
             }
