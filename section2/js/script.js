@@ -1,9 +1,4 @@
 (function(win, $){
-    function clone(src, out){
-        for (var attr in src.prototype){
-            out.prototype[attr] = src.prototype[attr];
-        }
-    }
     var Circle = function(){
         this.item = $('<div>', {class: 'circle'});
     };
@@ -23,7 +18,8 @@
     function Rect(){
         this.item = $('<div>', {'class': 'rect'});
     }
-    clone(Circle, Rect);
+    Rect.prototype = Object.create(Circle.prototype);
+    Rect.prototype.constructor = Rect;
 
     var RedCircleBuilder = function(){
         this.item = new Circle();
