@@ -1,26 +1,53 @@
 (function(win, $){
-    var RedCircle = function(){};
-    RedCircle.prototype.create = function(){
-        this.item = $('<div class="circle"></div>');
+    var Circle = function(){
+        this.item = $('<div>', {class: 'circle'});
+    };
+    Circle.prototype.move = function(left, top){
+        this.item.css('left', left);
+        this.item.css('top', top);
         return this;
     };
-
-    var BlueCircle = function(){
-
-    };
-    BlueCircle.prototype.create = function(){
-        this.item = $('<div class="circle" style="background: blue;"></div>');
+    Circle.prototype.color = function(color){
+        this.item.css('background-color', color);
         return this;
+    };
+    Circle.prototype.get = function(){
+        return this.item;
+    };
+
+    var RedCircleBuilder = function(){
+        this.item = new Circle();
+        this.init();
+        return this;
+    };
+    RedCircleBuilder.prototype.init = function(){
+        return this;
+    };
+    RedCircleBuilder.prototype.get = function(){
+        return this.item;
+    };
+
+    var BlueCircleBuilder = function(){
+        this.item = new Circle();
+        this.init();
+        return this;
+    };
+    BlueCircleBuilder.prototype.init = function(){
+        this.item.color('blue');
+        return this;
+    };
+    BlueCircleBuilder.prototype.get = function(){
+        return this.item;
     };
 
     var CircleFactory = function(){
         this.types = {};
 
         this.create = function(type){
-            return new this.types[type]().create();
+            return new this.types[type]().get();
         };
         this.register = function(type, cls){
-            if (cls.prototype.create){
+            if (cls.prototype.init && cls.prototype.get){
                 this.types[type] = cls;
             }
         };
@@ -33,8 +60,8 @@
             var _aCircle = [],
                 _stage = $('.advert'),
                 _cf = new CircleFactory();
-            _cf.register('red', RedCircle);
-            _cf.register('blue', BlueCircle);
+            _cf.register('red', RedCircleBuilder);
+            _cf.register('blue', BlueCircleBuilder);
 
             function _position(circle, left, top){
                 circle.css('left', left);
@@ -42,7 +69,7 @@
             }
 
             function create(left, top, type){
-                var circle = _cf.create(type).item;
+                var circle = _cf.create(type).get();
                 _position(circle, left, top);
                 return circle;
             }
