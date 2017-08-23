@@ -64,18 +64,17 @@
             _cf.register('blue', BlueCircleBuilder);
 
             function _position(circle, left, top){
-                circle.css('left', left);
-                circle.css('top', top);
+                circle.move(left, top);
             }
 
             function create(left, top, type){
-                var circle = _cf.create(type).get();
-                _position(circle, left, top);
+                var circle = _cf.create(type);
+                circle.move(left, top);
                 return circle;
             }
 
             function add(circle){
-                _stage.append(circle);
+                _stage.append(circle.get());
                 _aCircle.push(circle);
             }
 
