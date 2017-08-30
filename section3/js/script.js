@@ -58,7 +58,7 @@
     };
 
 
-    var CircleFactory = function(){
+    var ShapeFactory = function(){
             this.types = {};
             this.create = function(type){
                 return new this.types[type]().get();
@@ -72,38 +72,44 @@
     };
 
 
-    var CircleGeneratorSingleton = (function(){
+    var ShapeGeneratorSingleton = (function(){
         var instance;
 
         function init(){
-            var _aCircle = [],
-                    _stage = $('.advert'),
-                    _cf = new CircleFactory();
-                    _cf.register('red', RedCircleBuilder);
-                    _cf.register('blue', BlueCircleBuilder);
+            var _aShape = [],
+                _stage,
+                _sf = new ShapeFactory();
 
-            function _position(circle, left, top){
-                circle.move(left, top);
+            function registerShape(name, cls){
+                _sf.register(name, cls);
+            }
+
+            function setStage(stage){
+                _stage = stage;
             }
 
             function create(left, top,type){
-                var circle = _cf.create(type);
-                circle.move(left, top);
-                return circle;
+                var shape = _sf.create(type);
+                shape.move(left, top);
+                return shape;
             }
 
-            function add(circle){
-                _stage.append(circle.get());
-                _aCircle.push(circle);
+            function add(shape){
+                _stage.append(shape.get());
+                _aShape.push(shape);
             }
 
             function index(){
-                return _aCircle.length;
+                return _aShape.length;
             }
 
-            return {index:index,
-                            create:create,
-                            add:add};
+            return {
+                index:index,
+                create:create,
+                add:add,
+                register: registerShape,
+                setStage: setStage
+            };
         }
 
         return {
@@ -119,26 +125,26 @@
     })();
 
     $(win.document).ready(function(){
-        $('.advert').click(function(e){
-            var cg = CircleGeneratorSingleton.getInstance();
-            var circle = cg.create(e.pageX-25, e.pageY-25,"red");
-
-            cg.add(circle);
-
+        var sg = ShapeGeneratorSingleton.getInstance();
+        sg.register('red', RedCircleBuilder);
+        sg.register('blue', BlueCircleBuilder);
+        var stage = $('.advert');
+        sg.setStage(stage);
+        stage.click(function(e){
+            var circle = sg.create(e.pageX-25, e.pageY-25,"red");
+            sg.add(circle);
         });
 
         $(document).keypress(function(e){
             if(e.key==='a'){
-                var cg = CircleGeneratorSingleton.getInstance();
-                var circle = cg.create(Math.floor(Math.random()*600),
-                                                            Math.floor(Math.random()*600),
-                                                            "blue");
-
-                cg.add(circle);
+                var circle = sg.create(
+                    Math.floor(Math.random()*600),
+                    Math.floor(Math.random()*600),
+                    "blue"
+                );
+                sg.add(circle);
             }
-
         });
-
     });
 
 })(window, jQuery);
